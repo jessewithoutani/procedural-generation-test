@@ -1,0 +1,14 @@
+@import "https://unpkg.com/fixedsys-css/css/fixedsys.css";
+
+body {
+    margin: 0px;
+    font-family: "FixedSys";
+    font-size: 20px;
+}
+#debug {
+    color: #fff;
+
+    position: fixed;
+    top: 0px;
+    left: 0px;
+}
