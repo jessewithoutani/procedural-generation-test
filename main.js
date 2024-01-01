@@ -88,18 +88,6 @@ let world = null;
 
 
 
-function loadLighting() {
-    // 0x242930
-    const ambientLight = new THREE.AmbientLight(0x242930);
-    scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xede7df, 1.2);
-    const lightTarget = new THREE.Object3D();
-    lightTarget.position.set(1, 0, 1);
-    directionalLight.target = lightTarget
-    scene.add(directionalLight);
-    scene.add(lightTarget);
-}
 
 // scene.fog = new THREE.Fog(0x000000, 30, 85);
 scene.fog = new THREE.FogExp2(0x000000, 0.008);
@@ -112,6 +100,9 @@ let planetMesh = null;
 
 let cloudsMesh = null;
 
+let starMaterial = null;
+let starMesh = null;
+
 const cock = new THREE.Clock();
 const _input = new input.Input();
 
@@ -120,14 +111,31 @@ const zoomedFov = 30;
 let fov = defaultFov;
 let fovLerped = fov;
 
+const starVector = new THREE.Vector3(1, 0, 1);
+let starPosition = starVector.clone().add(new THREE.Vector3(0, -1, 0)).multiplyScalar(-500);
+
 // ==================================================
 
 // Debug info
 
 let fps = null;
+let timeData = null;
+
+function loadLighting() {
+    // 0x242930
+    const ambientLight = new THREE.AmbientLight(0x242930);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xede7df, 1.2);
+    const lightTarget = new THREE.Object3D();
+    lightTarget.position.set(starVector.x, starVector.y, starVector.z);
+    directionalLight.target = lightTarget
+    scene.add(directionalLight);
+    scene.add(lightTarget);
+}
 
 function loadWorld() {
-    world = new chunks.World(Math.random() * 100000, scene, {
+    world = new chunks.World(Math.round(Math.random() * 1000000), scene, {
         // Chunk Types
         "empty": []
     }, {
@@ -135,7 +143,14 @@ function loadWorld() {
     }, rapier);
     world.addChunkWeight("empty", 1);
 
+    document.getElementById("seed").innerHTML = `SEED: ${world.seed}`;
+    document.getElementById("world-type").innerHTML = 
+        `MODIFIER: ${world.modifierKey}<br>
+        WORLDTYPE: ${world.worldTypeKey}`;
+
     // ================================================================================
+
+    // Spawn planet
     
     const planetColors = [0xffffff, 0xbbeaed, 0x66abff, 0xbda78a, 0xdbb581];
     const planetColor = planetColors[Math.floor(planetColors.length * world.seededRandom.random())];
@@ -164,10 +179,22 @@ function loadWorld() {
     ringsMesh.position.set(0, 0, 0);
 
     cloudsMesh.position.set(0, 0, 0);
+
+    // ================================================================================
+
+    // Spawn star
+
+    // starMaterial = new THREE.SpriteMaterial({ map: utilities.loadTexture("textures/water.png"), fog: false, sizeAttenuation: false });
+    starMaterial = new THREE.MeshBasicMaterial({ color: 0xf4a980, fog: false });
+    starMesh = new THREE.Mesh(new THREE.SphereGeometry(25, 16, 8), starMaterial);
+    // starSprite.position.set(starMesh.position.x, starMesh.position.y, starMesh.position.z);
+
+    scene.add(starMesh);
 }
 
 function loadDebug() {
     fps = document.querySelector("#fps");
+    timeData = document.querySelector("#time");
 }
 
 function load() {
@@ -210,21 +237,26 @@ function update() {
 
     if (!loaded) return;
     const delta = cock.getDelta();
+    const elapsed = cock.getElapsedTime();
 
     // ========================================================
 
-    world.update(camera.position, cock.getElapsedTime());
+    world.update(camera.position, elapsed);
 
     planetMesh.position.set(camera.position.x, camera.position.y, camera.position.z);
     planetMesh.position.add(planetPosition);
+    starMesh.position.set(camera.position.x, camera.position.y, camera.position.z);
+    starMesh.position.add(starPosition);
+    // starSprite.position.set(starMesh.position.x, starMesh.position.y, starMesh.position.z);
 
-    cloudsMesh.rotation.set(0, cock.getElapsedTime() * 0.025, 0);
+    cloudsMesh.rotation.set(0, elapsed * 0.025, 0);
 
     // ========================================================
 
     // Debug info
 
     fps.innerHTML = `${Math.round(1 / delta)} FPS`;
+    timeData.innerHTML = `E: ${utilities.snap(elapsed, 0.01)}s<br>D: ${utilities.snap(delta, 0.01)}s`
 
     // ========================================================
 
