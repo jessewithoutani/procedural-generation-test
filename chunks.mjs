@@ -64,10 +64,8 @@ class World {
         this.seed = seed;
         this.seededRandom = new utilities.SeededRandom(this.seed);
 
-        const key = Object.keys(worldTypes)[Math.floor(this.seededRandom.random(this.seed) * Object.keys(worldTypes).length)];
-        this.worldType = worldTypes[key];
-
-        console.log(key);
+        this.worldTypeKey = Object.keys(worldTypes)[Math.floor(this.seededRandom.random(this.seed) * Object.keys(worldTypes).length)];
+        this.worldType = worldTypes[this.worldTypeKey];
 
         this.chunks = {};
         this.propTypes = propTypes;
@@ -94,11 +92,8 @@ class World {
 
         // ======================================================
 
-        this.modifier = modifiers[
-            this.worldType.modifiers[
-                Math.floor(this.worldType.modifiers.length * this.seededRandom.random(this.seed + 3))
-            ]
-        ];
+        this.modifierKey = this.worldType.modifiers[Math.floor(this.worldType.modifiers.length * this.seededRandom.random(this.seed + 3))];
+        this.modifier = modifiers[this.modifierKey];
         this.perlin = new ImprovedNoise();
 
         // Add ocean
