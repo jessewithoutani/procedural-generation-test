@@ -275,6 +275,7 @@ class Chunk {
         
         // console.log(JSON.stringify(this.world.rapier));
         this.world.rapier.addMesh(plane);
+        plane.receiveShadow = true;
 
         // console.log(`newchunk ${this.children}`)
     }

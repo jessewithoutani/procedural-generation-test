@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
-import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
+// import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
+import { RapierPhysics } from './rapier.mjs';
 
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
@@ -51,6 +52,7 @@ scene.background.minFilter = scene.background.magFilter = THREE.NearestFilter;
 
 const renderer = new THREE.WebGLRenderer();
 renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
@@ -130,6 +132,7 @@ function loadLighting() {
     const lightTarget = new THREE.Object3D();
     lightTarget.position.set(starVector.x, starVector.y, starVector.z);
     directionalLight.target = lightTarget
+    directionalLight.castShadow = true;
     scene.add(directionalLight);
     scene.add(lightTarget);
 }
