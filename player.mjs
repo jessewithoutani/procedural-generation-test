@@ -6,7 +6,7 @@ class Player {
         const playerGeometry = new THREE.CapsuleGeometry(1, 2, 1, 6);
         const playerMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
         this.mesh = new THREE.Mesh(playerGeometry, playerMaterial);
-        rapier.addMesh(this.mesh, 45);
+        rapier.addMesh(this.mesh, 45, 1);
         this.scene.add(this.mesh);
         console.log(`playerload ${JSON.stringify(this.mesh.userData)}`);
     }
