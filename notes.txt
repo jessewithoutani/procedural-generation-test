@@ -1,1 +1,2 @@
-git checkout <branchname>
+git checkout development
+git pull origin development
